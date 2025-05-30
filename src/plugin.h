@@ -47,7 +47,7 @@ class LlamaComponent : public Llama::Component {
   llama_model *model_ = nullptr;
   llama_context *ctx_ = nullptr;
   int dim_ = 0;
-  unordered_map<string, vector<float>> cache_;
+  hash_map<string, vector<float>> cache_;
 };
 
 }

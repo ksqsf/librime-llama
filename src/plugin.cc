@@ -168,7 +168,7 @@ static float dot(std::vector<float> a, std::vector<float> b) {
   }
   if (norm_a == 0.0f || norm_b == 0.0f)
     return 0.0f;
-  return dot / (sqrtf(norm_a) * sqrtf(norm_b));
+  return sqrtf(dot * dot / (norm_a * norm_b));
 }
 
 }
