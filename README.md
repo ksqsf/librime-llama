@@ -16,7 +16,7 @@ Then, for each candidate, librime-llama computes the word embedding, and then co
 
 ## How good is it?
 
-It does not work as well as expected. The 'grammar' support of Rime tries to enumerate combinations and compute how strong two words are related. This works well for n-gram, but (1) causes severe delays and (2) messes up the candidate sorting quite a bit.
+It does not work as well as expected. The 'grammar' support of Rime tries to enumerate combinations and compute how strong two words are related. This works well for n-gram, but in the case of librime-llama, (1) causes severe delays and (2) messes up the candidate sorting quite a bit.
 
 Theoretically, librime-llama works best when the context window is very long (so that we know the "topic" of the session), and then determines which next words align with the topic. But this is not the case for Rime today.
 
