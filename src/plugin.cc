@@ -25,14 +25,34 @@ Llama::Llama(Config* config, LlamaComponent* component)
 
 Llama::~Llama() {}
 
+static size_t utf8len(const string& s) {
+  size_t count = 0;
+  const char* p = s.c_str();
+  while (p != s.c_str() + s.length()) {
+    utf8::unchecked::next(p);
+    count++;
+  }
+  return count;
+}
+
 double Llama::Query(const string& context, const string& word, bool is_rear) {
-  LOG(INFO) << "llama: query grammar '" << context << "' with word '" << word << "'";
   component_->Init();
+
+  // Uncomment this only if you modified librime accordingly, or it
+  // won't take effect:
+
+  // if (utf8len(context) < 20) {
+  //     // If the context is too short, it will be equivalent to
+  //     // comparing the similarity to two words, which is nonsensical.
+  //     return 0;
+  // }
 
 #ifdef TIME
   using namespace std::chrono;
   auto start = high_resolution_clock::now();
 #endif
+  
+  LOG(INFO) << "llama: query grammar '" << context << "' with word '" << word << "'";
 
   // Context embedding
   std::vector<float> context_emb;
