@@ -8,7 +8,7 @@ librime-llama is an experimental Rime plugin which tries to takes advantage of p
 
 librime-llama works in a similar way to librime-octagram, which is an n-gram (or "any-gram") implementation.
 
-Rime's grammar support provides a way to "contextually" weight each candidate, with the context provided as an argument. librime-octagram, for example, queries a gram DB and returns such contextual weights. librime-llama finds such them by querying llama.cpp.
+Rime's grammar support provides a way to "contextually" weight each candidate, with the context provided as an argument. librime-octagram, for example, queries a gram DB and returns such contextual weights. librime-llama just finds them by querying llama.cpp.
 
 As the first step, librime-llama computes the sentence embedding as a digest of the context. The idea is to summarize the "topic" of the context.
 
@@ -38,7 +38,7 @@ The performance is still not great because Rime tries to enumerate too many cand
 
 First, move `octagram` to somewhere not found by Rime.
 
-Then, get the model file and saves it as `/tmp/model.gguf`:
+Then, get the model file and save it as `/tmp/model.gguf`:
 
 - [paraphrase-multilingual-MiniLM-L12-118M-v2-Q8_0.gguf](https://huggingface.co/mykor/paraphrase-multilingual-MiniLM-L12-v2.gguf/tree/main)
 
