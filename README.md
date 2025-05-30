@@ -22,17 +22,17 @@ Theoretically, librime-llama works best when the context window is very long (so
 
 ## How fast is it?
 
-(Using the recommended model below.)
+(Using the recommended model below.) Each call to `Llama::Query` takes 3 ~ 6 ms. If you use an even smaller model, it can take as little as 1 ms.
 
-Since getting embeddings is a small task, please disable GPU and use pure CPU computation. For example, on macOS you would use:
+The performance is still not great because Rime tries to enumerate too many candidates, and the total latencies add up quickly. Also, Rime only provides a very short context window which unfortunately limits the capability of a transformer.
+
+Tip: Since getting embeddings is a small task, please disable GPU and use pure CPU computation. For example, on macOS you would use:
 
 ```
 -DLLAMA_METAL=OFF -DLLAMA_NATIVE=ON -DLLAMA_ACCELERATE=ON -DGGML_METAL=OFF
 ```
 
 (This is already hardcoded in CMakeLists.txt.)
-
-The performance is still not great because Rime tries to enumerate too many candidates, and the total latencies add up quickly. Also, Rime only provides a very short context window which unfortunately limits the capability of a transformer.
 
 ## How to use?
 

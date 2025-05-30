@@ -10,6 +10,11 @@ extern "C" {
 #include "llama.h"
 }
 
+// #define TIME
+#ifdef TIME
+#include <chrono>
+#endif
+
 namespace rime {
 
 static float dot(std::vector<float> a, std::vector<float> b);
@@ -23,6 +28,11 @@ Llama::~Llama() {}
 double Llama::Query(const string& context, const string& word, bool is_rear) {
   LOG(INFO) << "llama: query grammar '" << context << "' with word '" << word << "'";
   component_->Init();
+
+#ifdef TIME
+  using namespace std::chrono;
+  auto start = high_resolution_clock::now();
+#endif
 
   // Context embedding
   std::vector<float> context_emb;
@@ -39,9 +49,15 @@ double Llama::Query(const string& context, const string& word, bool is_rear) {
   // Returns topical similarity
   float similarity = dot(context_emb, word_emb);
   LOG(INFO) << "similarity between '" << context << "' and '" << word << "' is "<< similarity;
+
+#ifdef TIME
+  auto end = high_resolution_clock::now();
+  auto duration = duration_cast<milliseconds>(end - start);
+  LOG(INFO) << "llama: query completed in " << duration.count() << " ms";
+#endif
   return similarity;
 }
-    
+
 LlamaComponent::LlamaComponent() {
   Init();
 }
@@ -62,7 +78,7 @@ void LlamaComponent::Init() {
     return;
   else
     inited_ = true;
-  
+
   LOG(INFO) << "llama: trying to initialize llama.cpp";
   llama_backend_init();
 
@@ -86,7 +102,7 @@ void LlamaComponent::Init() {
     init_failed_ = true;
     return;
   }
-  
+
   dim_ = llama_model_n_embd(model_);
   LOG(INFO) << "llama: model loaded successfully, dim=" << dim_;
   init_failed_ = false;
@@ -96,14 +112,14 @@ std::vector<float> LlamaComponent::GetEmbedding(const string& s) {
   Init();
   if (init_failed_)
     return {};
-  
+
   auto it = cache_.find(s);
-  
+
 
   // Tokenization
   std::vector<llama_token> tokens(512);
   const llama_vocab *vocab = llama_model_get_vocab(model_);
-  int n_tokens = llama_tokenize(vocab, 
+  int n_tokens = llama_tokenize(vocab,
                                 s.c_str(),
                                 s.length(),
                                 tokens.data(),
@@ -125,14 +141,14 @@ std::vector<float> LlamaComponent::GetEmbedding(const string& s) {
   }
   batch.n_tokens = n_tokens;
   batch.logits[batch.n_tokens - 1] = true;
-  
+
   // Encode
   if (llama_encode(ctx_, batch) != 0) {
     llama_batch_free(batch);
     LOG(ERROR) << "llama: Failed to encode '" << s << "'";
     return {};
   }
-  
+
   // Get embeddings
   const float *emb = llama_get_embeddings_seq(ctx_, 0);
   if (!emb) {
@@ -152,15 +168,15 @@ std::vector<float> LlamaComponent::GetEmbedding(const string& s) {
 static float dot(std::vector<float> a, std::vector<float> b) {
   if (a.size() != b.size())
     return 0.0f;
-  
+
   size_t n = a.size();
   const float* __restrict__ pa = a.data();
   const float* __restrict__ pb = b.data();
-  
+
   float dot = 0.0f;
   float norm_a = 0.0f;
   float norm_b = 0.0f;
-  
+
   for (size_t i = 0; i < n; ++i) {
     dot += pa[i] * pb[i];
     norm_a += pa[i] * pa[i];
